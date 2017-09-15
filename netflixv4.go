@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 )
@@ -46,7 +47,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		server := &dns.Server{Addr: ":" + strconv.Itoa(port), Net: "udp", Handler: serveMux}
+		server := &dns.Server{Addr: ":" + strconv.FormatUint(uint64(listenPort), 10), Net: "udp", Handler: serveMux}
 		servers <- server
 		if err := server.ListenAndServe(); err != nil {
 			log.Printf("UDP listener err: %v", err)
@@ -56,20 +57,23 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		server := &dns.Server{Addr: ":" + strconv.Itoa(port), Net: "tcp", Handler: serveMux}
+		server := &dns.Server{Addr: ":" + strconv.FormatUint(uint64(listenPort), 10), Net: "tcp", Handler: serveMux}
 		servers <- server
 		if err := server.ListenAndServe(); err != nil {
 			log.Printf("TCP listener err: %v", err)
 		}
 	}()
 
-	sig := make(chan os.Signal)
-	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-	_ = <-sig
-	for i := 0; i < 2; i++ {
-		server := <-servers
-		server.Shutdown()
-	}
+	go func() {
+		sig := make(chan os.Signal)
+		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+		_ = <-sig
+		for i := 0; i < 2; i++ {
+			server := <-servers
+			server.Shutdown()
+		}
+	}()
+
 	wg.Wait()
 
 }
