@@ -1,4 +1,5 @@
-== netflix-v4 ==
+# netflix-v4 
+
 This small Go program exists to solve an annoying problem: Netflix blocks
 Hurricane Electric's [tunnelbroker.net](https://tunnelbroker.net) tunnels, 
 which have been used to circumvent copyright laws. However, Netflix's client 
@@ -8,7 +9,7 @@ then error out.
 This program cannot be used to circumvent Netflix's region blocking. It simply
 forces Netflix clients to use IPv4, which is hopefully not discriminated against.
 
-=== Installation on an EdgeRouter X ===
+## Installation on an EdgeRouter X 
 
 I use an Ubiquiti EdgeRouter X as my home router, and have configured the DNS
 forwarder (dnsmasq) on it to forward requests for netflix.com (and associated
@@ -52,7 +53,7 @@ configuration mode in the EdgeRouter CLI and add the following:
 set service dns forwarding options 'server=/netflix.com/nflximg.com/nflxext.com/nflxvideo.com/127.0.0.1#5353'
 ```
 
-=== Inspiration and Acknowledgements ===
+## Inspiration and Acknowledgements ##
 This is pretty much a straight Go port of [Chris Howie's Python implementation](https://github.com/cdhowie/netflix-no-ipv6-dns-proxy).
 However, installing that script's dependencies directly on the EdgeRouter itself
 takes up a significant chunk of the EdgeRouter's available storage, which prevented
